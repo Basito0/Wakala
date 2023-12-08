@@ -1,3 +1,4 @@
+import 'package:evaluacion2/wakalaList.dart';
 import 'package:flutter/material.dart';
 
 import 'login.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: LoginPage(),
+      home: WakalaList(),
     );
   }
 }
