@@ -27,7 +27,10 @@ class LoginPage extends StatelessWidget {
           ),
         ),
         FloatingActionButton.extended(
-            onPressed: onPressed, label: Text("Ingresar"))
+            onPressed: onPressed, label: Text("Ingresar")),
+        Text("Desarrolladores:"),
+        Text("Desarollador 1"),
+        Text("Desarrollador 2")
       ],
     ));
   }
