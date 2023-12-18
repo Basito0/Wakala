@@ -4,27 +4,35 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import "funciones_api.dart";
+import "preferencias.dart";
 
-String link = "04b7-2800-150-109-da7-6095-a10a-2228-1789.ngrok-free.app";
 String sector = "";
 String descripcion = "";
 String usuarioActual = "anon";
 int current_post_id = 0;
-List<dynamic>? userList;
-void main() {
+
+
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await sharedPrefs.init();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Wakala',
       home: LoginPage(),
     );
   }
+
 }
 
 
@@ -35,48 +43,14 @@ class PostsScreen extends StatefulWidget {
   _PostsScreenState createState() => _PostsScreenState();
 }
 
-
-
 class _PostsScreenState extends State<PostsScreen> {
   @override
   void initState() {
     super.initState();
-    fetchPosts(); 
+    fetchPosts(sharedPrefs.getLink()); 
   }
 
-  Future<List<dynamic>> fetchPosts() async {
-    try {
-      var url = Uri.https(link, "/posts");
-      final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
-      print(response.body);
-      if (response.statusCode == 200) {
-          print('Conectado con éxito');
-          Fluttertoast.showToast(
-            msg: 'Posts cargados exitosamente',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-        );
-        return json.decode(response.body);
-      } else {
 
-        print('Error al cargar los posts. Status Code: ${response.statusCode}');
-        Fluttertoast.showToast(
-          msg: 'Error al cargar los posts. Status Code: ${response.statusCode}',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: const Color.fromARGB(255, 162, 28, 28),
-          textColor: Colors.white,
-        );
-        return [];
-      }
-    } catch (e) {
-      
-      print('Error al cargar los posts: $e');
-      return [];
-    }
-  }
 
   @override
 Widget build(BuildContext context) {
@@ -94,7 +68,7 @@ Widget build(BuildContext context) {
         ),
     ),
     body: FutureBuilder<List<dynamic>>(
-      future: fetchPosts(),
+      future: fetchPosts(sharedPrefs.getLink()),
       builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
         
         if (snapshot.hasData) {
@@ -182,7 +156,7 @@ Widget build(BuildContext context) {
               padding: const EdgeInsets.only(bottom: 16, left: 16),
               child: ElevatedButton(
                 onPressed: () async{
-                  await fetchPosts();
+                  await fetchPosts(sharedPrefs.getLink());
                   setState(() {});
                 },
                 style: ElevatedButton.styleFrom(
@@ -211,72 +185,6 @@ Widget build(BuildContext context) {
 
 class PostDetails extends StatelessWidget {
   PostDetails({super.key});
-
-  Future<void> addCommentToPost(int postId, Map<String, dynamic> commentData) async {
-  var url = Uri.https(link, "/posts/$current_post_id");
-  final response = await http.put(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: json.encode(commentData),
-  );
-  if (response.statusCode == 200) {
-      Fluttertoast.showToast(
-        msg: "Comentario añadido exitosamente",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    print('Comentario añadido exitosamente');
-  } else {
-      Fluttertoast.showToast(
-        msg: "Error añadiendo comentario. status code: ${response.statusCode}",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    print('Error añadiendo comentario: ${response.body}');
-    throw Exception('Error añadiendo comentario ${response.body}');
-  }
-}
-
-  Future<Map<String, dynamic>> fetchPost() async {
-    try {
-      var url = Uri.https(link, "/posts/$current_post_id");
-      final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
-      
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        print('Error al cargar los posts. Status Code: ${response.statusCode}');
-
-        return {}; 
-      }
-    } catch (e) {
-      print('Error al cargar post: $e');
-
-      return {}; 
-    }
-  }
-
-  Future<void> editarContadores(int postId, Map<String, dynamic> contador) async {
-  var url = Uri.https(link, "/posts/$current_post_id");
-  final response = await http.put(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: json.encode(contador),
-  );
-  if (response.statusCode == 200) {
-    print('Contador incrementado en un post');
-  } else {
-
-    print('Error incrementando contador: ${response.body}');
-    throw Exception('incrementando contador ${response.body}');
-  }
-}
-
-
   TextEditingController commentController= TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -296,7 +204,7 @@ class PostDetails extends StatelessWidget {
         ),
       ),
 body: FutureBuilder<Map<String, dynamic>>(
-  future: fetchPost(),
+  future: fetchPost(sharedPrefs.getLink(), current_post_id),
   builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return const Center(child: CircularProgressIndicator());
@@ -343,7 +251,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                             "username": usuarioActual,
                             "comentario": commentController.text
                           };
-                          await addCommentToPost(snapshot.data!['id'], commentData);
+                          await addCommentToPost(sharedPrefs.getLink(), snapshot.data!['id'], commentData);
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => PostDetails()),
@@ -362,7 +270,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
-                          color: const Color.fromARGB(255, 104, 56, 125),
+                          color: Colors.white,
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
                         child: const Icon(Icons.send),
@@ -374,7 +282,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                         GestureDetector(
                           onTap: () async {
                             Map<String, dynamic> contadores = {"sigue_ahi": 1, "ya_no_esta": 0, "username": usuarioActual};
-                            editarContadores(snapshot.data!['id'], contadores);          
+                            editarContadores(sharedPrefs.getLink(), snapshot.data!['id'], contadores);          
                             Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => PostDetails()),
@@ -392,7 +300,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                         GestureDetector(
                           onTap: () async {
                             Map<String, dynamic> contadores = {"sigue_ahi": 0, "ya_no_esta": 1, "username": usuarioActual};
-                            editarContadores(snapshot.data!['id'], contadores);         
+                            editarContadores(sharedPrefs.getLink(), snapshot.data!['id'], contadores);         
                             Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => PostDetails()),
@@ -455,47 +363,12 @@ body: FutureBuilder<Map<String, dynamic>>(
 }
   
 
-      
 
-
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
     TextEditingController usernameController= TextEditingController();
     TextEditingController passwordController= TextEditingController();
 
   LoginPage({super.key});
-
-    Future<List<dynamic>> fetchUsers() async {
-    try {
-      var url = Uri.https(link, "/userlist");
-      final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
-      if (response.statusCode == 200) {
-          print('Userlist cargada');
-          userList = json.decode(response.body);
-        return json.decode(response.body);
-      } else {
-      Fluttertoast.showToast(
-        msg: "Error al cargar userlist. status code: ${response.statusCode}",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-        print('Error al cargar userlist: ${response.statusCode}');
-        return [];
-      }
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: "'Error al cargar userlist: $e'",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      print('Error al cargar userlist: $e');
-      return [];
-    }
-  }
-
  @override
   Widget build(BuildContext context) {
       return Scaffold(
@@ -509,7 +382,7 @@ class LoginPage extends StatelessWidget {
           ),
       ),
       body: FutureBuilder<List<dynamic>>(
-      future: fetchUsers(),
+      future: fetchUsers(sharedPrefs.getLink()),
       builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
       return Padding(
         padding: const EdgeInsets.all(16.0),
@@ -610,6 +483,12 @@ class LoginPage extends StatelessWidget {
       );})
     );
   }
+  
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    throw UnimplementedError();
+  }
 }
 
 class CreateAccountScreen extends StatelessWidget {
@@ -624,35 +503,6 @@ class CreateAccountScreen extends StatelessWidget {
     var correoRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return correoRegex.hasMatch(correo);
   }
-
-    Future<String> addUser(Map<String, dynamic> userMap) async {
-    try {
-      var url = Uri.https(link, "/userlist");  
-      var response = await http.post(url, headers: {'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json'}, body: jsonEncode(userMap));
-      if (response.statusCode == 200) {
-        return "Usuario añadido";
-      } else {
-        Fluttertoast.showToast(
-          msg: "Error al añadir usuario. Status code: ${response.statusCode}",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-       );
-        return "Error al añadir usuario: ${response.statusCode}";
-      }
-    } catch (e) {
-        Fluttertoast.showToast(
-          msg: "Error : $e",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-       );
-      return "Error añadiendo usuario: $e";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -738,7 +588,7 @@ class CreateAccountScreen extends StatelessWidget {
                       "email": emailController.text,
                       "password": passwordController.text
                     };
-                    addUser(userData);
+                    addUser(sharedPrefs.getLink(), userData);
                       Fluttertoast.showToast(
                         msg: "Tu cuenta fue creada exitosamente!",
                         toastLength: Toast.LENGTH_SHORT,
@@ -779,7 +629,7 @@ class NewPostScreen extends StatelessWidget {
   // funcion para hacer posts
   Future<String> addPost(Map<String, dynamic> postMap) async {
     try {
-      var url = Uri.https(link, "/posts");  
+      var url = Uri.https(sharedPrefs.getLink(), "/posts");  
       var response = await http.post(url, headers: {'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json'}, body: jsonEncode(postMap));
       if (response.statusCode == 200) {
         Fluttertoast.showToast(
@@ -1003,7 +853,7 @@ class ConexionErrorScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                link = urlController.text;
+                sharedPrefs.setLink(urlController.text);
                 Navigator.of(context).pop();
               },
               style: ButtonStyle(
