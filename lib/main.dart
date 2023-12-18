@@ -364,7 +364,7 @@ body: FutureBuilder<Map<String, dynamic>>(
   
 
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
     TextEditingController usernameController= TextEditingController();
     TextEditingController passwordController= TextEditingController();
 
@@ -483,12 +483,7 @@ class LoginPage extends StatefulWidget {
       );})
     );
   }
-  
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
+
 }
 
 class CreateAccountScreen extends StatelessWidget {
