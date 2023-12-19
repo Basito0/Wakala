@@ -2,10 +2,11 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'preferencias.dart';
 List<dynamic>? userList;
 
 Future<void> editarContadores(String link, int postId, Map<String, dynamic> contador) async {
-  var url = Uri.https(link, "/posts/$postId");
+  Uri url = sharedPrefs.getUrl("/posts/$postId");
   final response = await http.put(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -25,7 +26,7 @@ Future<void> editarContadores(String link, int postId, Map<String, dynamic> cont
 
 Future<List<dynamic>> fetchPosts(String link) async {
   try {
-    var url = Uri.https(link, "/posts");
+    Uri url = sharedPrefs.getUrl("/posts");
     final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
     print(response.body);
     if (response.statusCode == 200) {
@@ -57,8 +58,9 @@ Future<List<dynamic>> fetchPosts(String link) async {
   }
 }
 
-  Future<void> addCommentToPost(String link, int postId, Map<String, dynamic> commentData) async {
-  var url = Uri.https(link, "/posts/$postId");
+Future<void> addCommentToPost(String link, int postId, Map<String, dynamic> commentData) async {
+  Uri url = sharedPrefs.getUrl("/posts/$postId");
+  
   final response = await http.put(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -89,7 +91,7 @@ Future<List<dynamic>> fetchPosts(String link) async {
 
 Future<Map<String, dynamic>> fetchPost(String link, postId) async {
   try {
-    var url = Uri.https(link, "/posts/$postId");
+    Uri url = sharedPrefs.getUrl("/posts/$postId");
     final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
     
     if (response.statusCode == 200) {
@@ -107,9 +109,9 @@ Future<Map<String, dynamic>> fetchPost(String link, postId) async {
 }
 
 
-   Future<List<dynamic>> fetchUsers(String link) async {
+  Future<List<dynamic>> fetchUsers(String link) async {
     try {
-      var url = Uri.https(link, "/userlist");
+      Uri url = sharedPrefs.getUrl("/userlist");
       final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
       if (response.statusCode == 200) {
           print('Userlist cargada');
@@ -142,7 +144,7 @@ Future<Map<String, dynamic>> fetchPost(String link, postId) async {
 
 Future<String> addUser(String link, Map<String, dynamic> userMap) async {
   try {
-    var url = Uri.https(link, "/userlist");  
+    Uri url = sharedPrefs.getUrl("/userlist"); 
     var response = await http.post(url, headers: {'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json'}, body: jsonEncode(userMap));
     if (response.statusCode == 200) {
       return "Usuario añadido";
@@ -165,5 +167,42 @@ Future<String> addUser(String link, Map<String, dynamic> userMap) async {
         textColor: Colors.white,
       );
     return "Error añadiendo usuario: $e";
+  }
+}
+
+
+Future<String> addPost(Map<String, dynamic> postMap) async {
+  try {
+    Uri url = sharedPrefs.getUrl("/posts");
+    var response = await http.post(url, headers: {'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json'}, body: jsonEncode(postMap));
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(
+        msg: "Wakala reportado con éxito",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+      
+      return "Wakala reportado con éxito";
+    } else {
+      Fluttertoast.showToast(
+        msg: "Error al denunciar. Status code: ${response.statusCode}",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return "Error al denunciar Wakala: ${response.statusCode}";
+    }
+  } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Error : $e",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    return "Error: $e";
   }
 }

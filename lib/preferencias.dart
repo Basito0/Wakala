@@ -1,4 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'funciones_api.dart';
+
 class SharedPrefs {
   late final SharedPreferences sharedPrefs;
   Future<void> init() async {
@@ -7,14 +9,23 @@ class SharedPrefs {
   }
 
   String getLink(){
-    String link = (sharedPrefs.getString('link') ?? "70d2-138-84-33-95.ngrok-free.app");
+    String link = (sharedPrefs.getString('link') ?? "cb61-138-84-33-95.ngrok-free.app");
     return link;
   }
 
 
   void setLink(String newLink){
     sharedPrefs.setString('link', newLink);
+    fetchUsers(getLink());
   }
+
+  Uri getUrl(String pathSegment){
+    if (getLink().contains('localhost')){
+      return Uri.http(getLink(), pathSegment);  
+    }else{
+      return Uri.https(getLink(), pathSegment); 
+    }
+  } 
 
 }
 
