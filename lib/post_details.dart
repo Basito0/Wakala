@@ -85,7 +85,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                             "username": usuarioActual,
                             "comentario": commentController.text
                           };
-                          await addCommentToPost(sharedPrefs.getLink(), snapshot.data!['id'], commentData);
+                          await addCommentToPost(sharedPrefs.getLink(), snapshot.data!["post"]['id'], commentData);
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => PostDetails()),
@@ -115,7 +115,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                         GestureDetector(
                           onTap: () async {
                             Map<String, dynamic> contadores = {"sigue_ahi": 1, "ya_no_esta": 0, "username": usuarioActual};
-                            editarContadores(sharedPrefs.getLink(), snapshot.data!['id'], contadores);          
+                            editarContadores(snapshot.data!["post"]['id'], contadores);          
                             Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => PostDetails()),
@@ -127,13 +127,13 @@ body: FutureBuilder<Map<String, dynamic>>(
                               color: const Color.fromARGB(255, 104, 56, 125),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
-                            child: Text("Sigue ahí (${snapshot.data!["sigue_ahi_count"]})")
+                            child: Text("Sigue ahí (${snapshot.data!["post"]["sigue_ahi_count"]})")
                           )
                         ),
                         GestureDetector(
                           onTap: () async {
                             Map<String, dynamic> contadores = {"sigue_ahi": 0, "ya_no_esta": 1, "username": usuarioActual};
-                            editarContadores(sharedPrefs.getLink(), snapshot.data!['id'], contadores);         
+                            editarContadores(snapshot.data!["post"]['id'], contadores);         
                             Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => PostDetails()),
@@ -145,7 +145,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                               color: const Color.fromARGB(255, 104, 56, 125),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
-                            child: Text("Ya no está (${snapshot.data!["ya_no_esta_count"]})")
+                            child: Text("Ya no está (${snapshot.data!["post"]["ya_no_esta_count"]})")
                           )
                         ),
                       ],

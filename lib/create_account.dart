@@ -45,6 +45,7 @@ class CreateAccountScreen extends StatelessWidget {
              const SizedBox(height: 20.0),
              TextField(
               controller: passwordController,
+              obscureText: true,
               decoration: const InputDecoration(
                 labelText: 'Contraseña',
                 border: OutlineInputBorder(),

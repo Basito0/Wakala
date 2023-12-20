@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'preferencias.dart';
 List<dynamic>? userList;
 
-Future<void> editarContadores(String link, int postId, Map<String, dynamic> contador) async {
+Future<void> editarContadores(int postId, Map<String, dynamic> contador) async {
   Uri url = sharedPrefs.getUrl("/posts/$postId");
   final response = await http.put(
     url,
