@@ -9,7 +9,7 @@ class SharedPrefs {
   }
 
   String getLink(){
-    String link = (sharedPrefs.getString('link') ?? "cb61-138-84-33-95.ngrok-free.app");
+    String link = (sharedPrefs.getString('link') ?? "301f-2800-150-109-da7-5ce4-3923-98b-c8a0.ngrok-free.app/");
     return link;
   }
 

@@ -10,7 +10,7 @@ class ConexionErrorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Solucionar problemas de conexión'),
+        title: const Text('Problemas de conexión'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

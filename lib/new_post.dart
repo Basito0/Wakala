@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import "posts_screen.dart";
 import 'dart:convert';
 import 'dart:io';
 
@@ -193,8 +194,20 @@ class NewPostScreen extends StatelessWidget {
                         "descripcion": descripcionController.text,
                         "username": usuarioActual
                       };
+                      Uint8List foto1Bytes = await foto1!.readAsBytes();
+                      Uint8List foto2Bytes = await foto1!.readAsBytes();
+                      
+                      Map<String, dynamic> images = {                 
+                        "base64image1": base64Encode(foto1Bytes),
+                        "base64image2": base64Encode(foto2Bytes)
+                      };
                       await addPost(postData);
-                      Navigator.of(context).pop();
+                      print(postData);
+                      await addImagesToPost(await numOfPosts(), images);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PostsScreen()),
+                      );
                     }else{
                       Fluttertoast.showToast(
                         msg: "Debes completar todos los campos",

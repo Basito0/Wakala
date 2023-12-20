@@ -22,11 +22,65 @@ Future<void> editarContadores(String link, int postId, Map<String, dynamic> cont
 }
 
 
+Future<int> numOfPosts() async {
+    Uri url = sharedPrefs.getUrl("/posts");
+    final response = await http.get(url, headers: {'Content-Type': 'application/json'});
+  if (response.statusCode == 200) {
+    final List<dynamic> posts = json.decode(response.body);
+    return posts.length;
+  } else {
+    throw Exception('Error cargando posts en funcion numOfPosts');
+  }
+}
+
+
+
+Future<void> addImagesToPost(int postId, Map<String, dynamic> images) async {
+  Uri url = sharedPrefs.getUrl("/posts/$postId/images");
+  images["post_id"] = postId;
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(images),
+  );
+  if (response.statusCode == 200) {
+    print('Se añadieron imagenes a post $postId');
+  } else {
+    throw Exception('Error añadiendo imagenes a post $postId ${response.body}');
+  }
+}
+
+
+Future<List<dynamic>> fetchImage(int postId) async{
+    try {
+    Uri url = sharedPrefs.getUrl("/post/$postId/images");
+    final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
+    print(response.body);
+    if (response.statusCode == 200) {
+      print("imagenes de post $postId cargadas");
+      return json.decode(response.body);
+    } else {
+      print('Error al cargar imagenes. status code: ${response.statusCode}');
+      Fluttertoast.showToast(
+        msg: 'Error al cargar los imagenes. status code: ${response.statusCode}',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: const Color.fromARGB(255, 162, 28, 28),
+        textColor: Colors.white,
+      );
+      return [];
+    }
+  } catch (e) {  
+    print('Error al cargar imagenes: $e');
+    return [];
+  }
+}
 
 
 Future<List<dynamic>> fetchPosts(String link) async {
   try {
     Uri url = sharedPrefs.getUrl("/posts");
+    
     final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
     print(response.body);
     if (response.statusCode == 200) {
@@ -92,10 +146,15 @@ Future<void> addCommentToPost(String link, int postId, Map<String, dynamic> comm
 Future<Map<String, dynamic>> fetchPost(String link, postId) async {
   try {
     Uri url = sharedPrefs.getUrl("/posts/$postId");
+    Uri imageUrl = sharedPrefs.getUrl("/posts/$postId/images");
     final response = await http.get(url, headers: {'ngrok-skip-browser-warning': 'true'});
-    
+    final imageResponse = await http.get(imageUrl, headers: {'ngrok-skip-browser-warning': 'true'});
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      Map<String, dynamic> postData = {
+        "post": json.decode(response.body),
+        "images": json.decode(imageResponse.body),
+      };
+      return postData;
     } else {
       print('Error al cargar los posts. Status Code: ${response.statusCode}');
 
@@ -125,6 +184,7 @@ Future<Map<String, dynamic>> fetchPost(String link, postId) async {
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
+        print(url);
         print('Error al cargar userlist: ${response.statusCode}');
         return [];
       }
