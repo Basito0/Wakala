@@ -73,9 +73,9 @@ class PostDetails extends StatelessWidget {
                           Center(
                               child: Text(
                                   "Subido por @${snapshot.data!["post"]['username']} el ${snapshot.data!["post"]['fecha']}")),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
                     GestureDetector(
                       onTap: (){
                         fotoParaPost_Details=foto1decoded;
@@ -97,8 +97,8 @@ class PostDetails extends StatelessWidget {
                       child: imagenWidget(foto2decoded)
                     )        
                               ]),
-                          Row(children: [
-                            FloatingActionButton.extended(
+                            SizedBox(height: 20),
+                            Center(child:FloatingActionButton.extended(
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -108,10 +108,12 @@ class PostDetails extends StatelessWidget {
                                 );
                               },
                               label: Text("Comentar"),
-                            )
-                          ]),
+                            )),
+                          SizedBox(height: 20),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              
                               GestureDetector(
                                   onTap: () async {
                                     Map<String, dynamic> contadores = {
