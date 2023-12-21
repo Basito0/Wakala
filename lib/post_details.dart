@@ -76,8 +76,26 @@ class PostDetails extends StatelessWidget {
                           Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                imagenWidget(foto1decoded),
-                                imagenWidget(foto2decoded)
+                    GestureDetector(
+                      onTap: (){
+                        fotoParaPost_Details=foto1decoded;
+                        Navigator.push(
+                         context,
+                          MaterialPageRoute(builder: (context) => ImageDetail()),
+                        );
+                      },
+                      child: imagenWidget(foto1decoded)
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        fotoParaPost_Details=foto2decoded;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ImageDetail()),
+                        );
+                      },
+                      child: imagenWidget(foto2decoded)
+                    )        
                               ]),
                           Row(children: [
                             FloatingActionButton.extended(
@@ -112,10 +130,12 @@ class PostDetails extends StatelessWidget {
                                   },
                                   child: Container(
                                       decoration: BoxDecoration(
+                                      border: Border.all(
+                                      color: Colors.black, // Border color
+                                      width: 1.0, // Border width
+                                      ),
                                         borderRadius:
                                             BorderRadius.circular(8.0),
-                                        color: const Color.fromARGB(
-                                            255, 104, 56, 125),
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 15.0, horizontal: 30.0),
@@ -139,10 +159,12 @@ class PostDetails extends StatelessWidget {
                                   },
                                   child: Container(
                                       decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.black, // Border color
+                                        width: 1.0, // Border width
+                                      ),
                                         borderRadius:
                                             BorderRadius.circular(8.0),
-                                        color: const Color.fromARGB(
-                                            255, 104, 56, 125),
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 15.0, horizontal: 30.0),
