@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:wakala/escribir_comentario.dart';
-
+import "image_detail.dart";
 import "globales.dart";
 import "preferencias.dart";
 import "funciones_api.dart";
