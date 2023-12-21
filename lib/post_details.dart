@@ -64,8 +64,25 @@ body: FutureBuilder<Map<String, dynamic>>(
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    imagenWidget(foto1decoded),
-                    imagenWidget(foto2decoded)
+                      onTap: (){
+                        fotoParaPost_Details=foto1decoded;
+                        Navigator.push(
+                         context,
+                          MaterialPageRoute(builder: (context) => ImageDetail()),
+                        );
+                      },
+                      child: imagenWidget(foto1decoded)
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        fotoParaPost_Details=foto2decoded;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ImageDetail()),
+                        );
+                      },
+                      child: imagenWidget(foto2decoded)
+                    )        
                   ]
                 ),
                 Row(
