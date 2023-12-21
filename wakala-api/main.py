@@ -24,52 +24,42 @@ def get_posts():
     return jsonify(posts)
 
 
-@app.route('/posts', methods=['POST'])
-# devuelve todos los posts que pertenecen a un usuario dado
-# usado para testeo
-@app.route("/posts/<string:username>")
-def getPostsByUser(username):
-    posts_found = []
-    for post in posts:
-        if post["username"] == username:
-            posts_found.append(post)
-    if len(posts_found) > 0:
-        return posts_found
-    return "No se encontraron posts"
-
 
 @app.route('/posts', methods=["POST"])
 def add_post():
-    # username defaults to anonymous if there is no username given
+    # username queda como anonymous si no se provee
     username = request.json.get("username", "anonymous")
     new_post = {"sector": request.json["sector"],
+                "fecha": request.json["fecha"],
                 "descripcion": request.json["descripcion"],
                 "username": username,
                 "comentarios": [],
                 "sigue_ahi_count": 0,
                 "ya_no_esta_count": 0,
-                "id": len(posts)
+                "sigue_ahi_users": [],
+                "ya_no_esta_users": [],
+                    "id": len(posts)
                 }
     posts.append(new_post)
     return "recibido"
 
 
-@app.route('/userlist/<int:post_id>/images', methods=["POST"])
+@app.route('/posts/<int:post_id>/images', methods=["POST"])
 def add_images(post_id):
     request_data = request.get_json()
-    base64image1 = request_data['image1']
-    base64image2 = request_data['image2']
+    base64image1 = request_data['base64image1']
+    base64image2 = request_data['base64image2']
     new_image = {"post_id": post_id, "base64image1": base64image1, "base64image2": base64image2}
     post_images.append(new_image)
     return "recibido"
 
 
-@app.route('/userlist/<int:post_id>/images', methods=["GET"])
+@app.route('/posts/<int:post_id>/images', methods=["GET"])
 def get_images(post_id):
     for image in post_images:
         if image["post_id"] == post_id:
-            return image
-    return "no se encontro imagen"
+            return jsonify(image)
+    return "Imagenes no encontradas"
 
 
 @app.route('/userlist', methods=["POST"])
@@ -104,6 +94,7 @@ def edit_post(post_id):
     if "sigue_ahi" in request.json:
         for post in posts:
             if post["id"] == post_id:
+                # edita contador de sigue_ahi
                 if request.json["username"] in post["sigue_ahi_users"]:
                     post["sigue_ahi_count"] -= request.json["sigue_ahi"]
                     post["sigue_ahi_users"].remove(request.json["username"])
@@ -111,6 +102,7 @@ def edit_post(post_id):
                     post["sigue_ahi_count"] += request.json["sigue_ahi"]
                     post["sigue_ahi_users"].append(request.json["username"])
 
+                # edita contador de ya_no_esta
                 if request.json["username"] in post["ya_no_esta_users"]:
                     post["ya_no_esta_count"] -= request.json["ya_no_esta"]
                     post["ya_no_esta_users"].remove(request.json["username"])
