@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import "posts_screen.dart";
 import 'dart:convert';
 import 'dart:io';
+
 
 class NewPostScreen extends StatelessWidget {
   TextEditingController sectorController = TextEditingController(text: sectorTempText);
@@ -197,11 +199,14 @@ class NewPostScreen extends StatelessWidget {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () async {
+                    DateTime now = DateTime.now();
+                    String formattedDate = DateFormat('dd-MM-yyyy').format(now);
                     if(sectorController.text!="" && descripcionController.text!="" && foto1!=null && foto2!=null){
                       Map<String, dynamic> postData = {
                         "sector": sectorController.text,
                         "descripcion": descripcionController.text,
-                        "username": usuarioActual
+                        "username": usuarioActual,
+                        "fecha": formattedDate
                       };
                       Uint8List foto1Bytes = await foto1!.readAsBytes();
                       Uint8List foto2Bytes = await foto2!.readAsBytes();
@@ -214,6 +219,8 @@ class NewPostScreen extends StatelessWidget {
                       print(postData);
                       await addImagesToPost(await numOfPosts(), images);
                       await addPost(postData);
+                      foto1=null;
+                      foto2=null;
                     Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const PostsScreen()),
@@ -241,6 +248,8 @@ class NewPostScreen extends StatelessWidget {
                   onPressed: () {
                       sectorTempText="";
                       descripcionTempText="";
+                      foto1=null;
+                      foto2=null;
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const PostsScreen()),

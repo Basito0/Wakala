@@ -60,6 +60,7 @@ body: FutureBuilder<Map<String, dynamic>>(
                     textAlign: TextAlign.justify,
                   ),
                 ),
+                Center(child: Text("Subido por @${snapshot.data!["post"]['username']} el ${snapshot.data!["post"]['fecha']}")),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -215,7 +216,7 @@ Widget cuadroGrisFoto(double largo) {
 }
 
 Widget imagenWidget(Uint8List imageBytes) {
-  if (imageBytes != null && imageBytes.isNotEmpty) {
+  if (imageBytes.isNotEmpty) {
     print(imageBytes);
     return Image.memory(
       imageBytes,

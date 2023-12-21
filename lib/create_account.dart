@@ -110,10 +110,10 @@ class CreateAccountScreen extends StatelessWidget {
                         backgroundColor: Colors.green,
                         textColor: Colors.white,
                       );
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
+                       MaterialPageRoute(builder: (context) => LoginPage()),
+                       );
 
                   }             
                 }
